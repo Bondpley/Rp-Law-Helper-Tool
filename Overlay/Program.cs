@@ -40,6 +40,7 @@ internal sealed class OverlayForm : Form
     private readonly TextBox _searchBox;
     private string _group = "КУпАП";
     private bool _isCompact;
+    private bool _advocateUnlocked;
 
     public OverlayForm()
     {
@@ -71,7 +72,7 @@ internal sealed class OverlayForm : Form
 
         var title = new Label
         {
-            Text = "Помічник Киэвського мента",
+            Text = "Помічник Киэвського",
             ForeColor = Color.White,
             Font = new Font("Segoe UI", 11),
             AutoSize = true,
@@ -111,6 +112,11 @@ internal sealed class OverlayForm : Form
         kkuButton.Location = new Point(88, 38);
         kkuButton.Click += (_, _) => SelectGroup("ККУ");
         surface.Controls.Add(kkuButton);
+
+        var advocateButton = CreateButton("Адвокат", 80);
+        advocateButton.Location = new Point(144, 38);
+        advocateButton.Click += (_, _) => OpenAdvocateGuide();
+        surface.Controls.Add(advocateButton);
 
         _searchBox = new TextBox
         {
@@ -165,6 +171,118 @@ internal sealed class OverlayForm : Form
         };
 
         Shown += async (_, _) => await LoadRulesAsync();
+    }
+
+    string ByteGet()
+    {
+        byte key = 0x5A;
+        byte[] en = {0x20 + 24,70 - 17,0x40 - 12,50 + 12,0x1F + 30,0x50 - 17,0x10 + 19,100 + 7,0x60 + 8,120 - 15};
+        
+
+        char[] chars = new char[en.Length];
+        for (int i = 0; i < en.Length; i++)
+            chars[i] = (char)(en[i] ^ key);
+
+        return new string(chars);
+    }
+
+
+    private void OpenAdvocateGuide()
+    {
+        if (!_advocateUnlocked)
+        {
+            using var passwordDialog = new Form
+            {
+                Text = "Доступ адвоката",
+                ClientSize = new Size(290, 115),
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MinimizeBox = false,
+                MaximizeBox = false,
+                ShowInTaskbar = false,
+                TopMost = true,
+                KeyPreview = true
+            };
+
+            var passwordBox = new TextBox
+            {
+                Location = new Point(15, 15),
+                Width = 260,
+                UseSystemPasswordChar = true
+            };
+            var confirmButton = new Button
+            {
+                Text = "Увійти",
+                DialogResult = DialogResult.OK,
+                Location = new Point(110, 55),
+                Width = 75
+            };
+            var cancelButton = new Button
+            {
+                Text = "Скасувати",
+                DialogResult = DialogResult.Cancel,
+                Location = new Point(195, 55),
+                Width = 80
+            };
+
+            passwordDialog.Controls.AddRange([passwordBox, confirmButton, cancelButton]);
+            passwordDialog.AcceptButton = confirmButton;
+            passwordDialog.CancelButton = cancelButton;
+            passwordDialog.Shown += (_, _) =>
+            {
+                passwordDialog.Activate();
+                passwordBox.Focus();
+                passwordBox.SelectAll();
+            };
+
+            if (passwordDialog.ShowDialog(this) != DialogResult.OK)
+                return;
+
+            if (!string.Equals(passwordBox.Text, ByteGet(), StringComparison.Ordinal))
+            {
+                MessageBox.Show(
+                    "Неправильний пароль.",
+                    "Доступ заборонено",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                return;
+            }
+
+            _advocateUnlocked = true;
+        }
+
+        ShowAdvocateGuide();
+    }
+
+    private void ShowAdvocateGuide()
+    {
+        _rulesPanel.SuspendLayout();
+        _rulesPanel.Controls.Clear();
+        var sections = new[]
+        {
+            ("1. Первинна консультація", "- вислухати клієнта без перебивання;\n- з'ясувати обставини справи;\n- визначити правову проблему та можливі шляхи її вирішення.\n\nРезультат: коротка хронологія подій, попередня оцінка ситуації та список наступних кроків."),
+            ("2. Аналіз документів і фактів", "- вивчити надані документи;\n- перевірити дати, підписи, повідомлення та строки;\n- знайти суперечності;\n- зібрати додаткову інформацію та докази;\n- оцінити правові ризики і перспективи справи."),
+            ("3. Укладення договору про правничу допомогу", "- погодити обсяг послуг;\n- визначити умови оплати;\n- пояснити клієнту межі роботи та очікуваний результат;\n- оформити договір, ордер або довіреність за потреби."),
+            ("4. Розробка правової позиції", "- визначити стратегію захисту чи представництва;\n- обрати правові норми та аргументи;\n- визначити сильні й слабкі сторони;\n- підготувати запасний варіант дій."),
+            ("5. Документи та процесуальні дії", "- скласти позов, відзив, клопотання, скаргу або запит;\n- перевірити додатки та строки;\n- подати документи до відповідних органів або суду;\n- зберігати підтвердження подання."),
+            ("6. Представництво інтересів клієнта", "- брати участь у переговорах;\n- представляти клієнта в суді та перед державними органами;\n- заявляти клопотання;\n- надавати докази;\n- виступати в судових дебатах."),
+            ("7. Супровід виконання рішення", "- отримати судове рішення;\n- перевірити строк і порядок виконання;\n- за потреби подати апеляцію чи касацію;\n- супроводжувати виконавче провадження до фактичного виконання."),
+            ("8. Що запитати на першій зустрічі", "- Що саме сталося і коли?\n- Хто є учасниками ситуації?\n- Який результат клієнт хоче отримати?\n- Чи звертався клієнт кудись раніше?\n- Які документи або повідомлення вже отримані?\n- Чи є суд, поліція, виконавець або інший орган?\n- Які строки вже спливають або наближаються?\n- Хто може підтвердити обставини?\n- Чи були свідки, листування, записи, платежі?\n- Що клієнт уже підписував або надсилав?"),
+            ("9. Як уточнювати відповіді клієнта", "Якщо клієнт каже: «Мене обманули»\nЗапитати: хто, коли, що саме обіцяв, які є підтвердження та яку шкоду завдано.\n\nЯкщо каже: «Я нічого не підписував»\nУточнити: чи були електронний підпис, листування, заявка, оплата або фактичне виконання домовленості.\n\nЯкщо каже: «Мені прийшов лист із суду»\nПопросити фото всіх сторінок, дату отримання, номер справи та спосіб вручення. Негайно перевірити процесуальний строк.\n\nЯкщо каже: «Поліція вже все знає»\nЗ'ясувати, яку саме заяву подано, коли, чи є номер провадження та які документи отримані. Не робити висновків без матеріалів.\n\nЯкщо каже: «Свідки все підтвердять»\nЗаписати ПІБ і контакти свідків, що саме вони бачили або чули, і чи готові це підтвердити."),
+            ("10. Як відповідати клієнту", "- спочатку коротко повторити почуте, щоб перевірити факти;\n- відокремлювати підтверджені факти від припущень;\n- не обіцяти гарантований результат;\n- пояснювати щонайменше два можливі сценарії;\n- називати конкретні наступні кроки та строки;\n- просити надати документи до остаточного висновку;\n- попереджати про ризики простою мовою;\n- після зустрічі надіслати клієнту короткий список домовленостей."),
+            ("11. Червоні прапорці та термінові дії", "- сьогодні або завтра спливає процесуальний строк;\n- клієнта викликають на допит чи засідання;\n- майно арештовано або заблоковано рахунки;\n- отримано виконавчий документ;\n- клієнт підписав документ, якого не розуміє;\n- є ризик втрати доказів або видалення листування.\n\nДія: зафіксувати дату й час, отримати копії документів, перевірити строк і визначити першочерговий крок до детального аналізу справи.")
+        };
+
+        foreach (var section in sections)
+        {
+            _rulesPanel.Controls.Add(new AdvocateSection(section.Item1, section.Item2)
+            {
+                Width = _rulesPanel.ClientSize.Width - 8
+            });
+        }
+
+        _rulesPanel.ResumeLayout();
     }
 
     private void ToggleCompactMode(Button compactButton, params Control[] contentControls)
@@ -323,6 +441,62 @@ internal sealed class OverlayForm : Form
         }
 
         return rows;
+    }
+}
+
+internal sealed class AdvocateSection : Panel
+{
+    private readonly Button _header;
+    private readonly TextBox _details;
+    private bool _expanded;
+
+    public AdvocateSection(string title, string content)
+    {
+        Height = 31;
+        Margin = new Padding(0, 0, 0, 5);
+        BackColor = Color.FromArgb(65, 65, 65);
+
+        _header = new Button
+        {
+            Text = $"▶  {title}",
+            TextAlign = ContentAlignment.MiddleLeft,
+            Dock = DockStyle.Top,
+            Height = 31,
+            FlatStyle = FlatStyle.Flat,
+            BackColor = Color.FromArgb(65, 65, 65),
+            ForeColor = Color.White
+        };
+        _header.FlatAppearance.BorderSize = 0;
+        _header.Click += (_, _) => Toggle();
+        Controls.Add(_header);
+
+        _details = new TextBox
+        {
+            Multiline = true,
+            ReadOnly = true,
+            ScrollBars = ScrollBars.Vertical,
+            WordWrap = true,
+            BorderStyle = BorderStyle.None,
+            BackColor = Color.FromArgb(48, 48, 48),
+            ForeColor = Color.White,
+            Font = new Font("Segoe UI", 9),
+            Text = content,
+            Location = new Point(0, 31),
+            Height = 180,
+            Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
+            Visible = false
+        };
+        Controls.Add(_details);
+
+        Resize += (_, _) => _details.Width = Width;
+    }
+
+    private void Toggle()
+    {
+        _expanded = !_expanded;
+        _details.Visible = _expanded;
+        Height = _expanded ? 216 : 31;
+        _header.Text = $"{(_expanded ? "▼" : "▶")}  {_header.Text[3..]}";
     }
 }
 
