@@ -1,0 +1,14 @@
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\bin\Debug\net10.0-windows\Overlay.exe
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\bin\Debug\net10.0-windows\Overlay.deps.json
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\bin\Debug\net10.0-windows\Overlay.runtimeconfig.json
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\bin\Debug\net10.0-windows\Overlay.dll
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\bin\Debug\net10.0-windows\Overlay.pdb
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\obj\Debug\net10.0-windows\Overlay.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\obj\Debug\net10.0-windows\Overlay.AssemblyInfoInputs.cache
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\obj\Debug\net10.0-windows\Overlay.AssemblyInfo.cs
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\obj\Debug\net10.0-windows\Overlay.csproj.CoreCompileInputs.cache
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\obj\Debug\net10.0-windows\Overlay.dll
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\obj\Debug\net10.0-windows\refint\Overlay.dll
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\obj\Debug\net10.0-windows\Overlay.pdb
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\obj\Debug\net10.0-windows\Overlay.genruntimeconfig.cache
+C:\Users\BondP\OneDrive\Рабочий стол\Overlay\obj\Debug\net10.0-windows\ref\Overlay.dll
